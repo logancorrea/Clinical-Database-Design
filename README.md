@@ -2,49 +2,36 @@
 
 ## Background
 
-A genetic testing company specializes in analyzing an individual's DNA to provide insights into various aspects of their genetic makeup. The primary goal is to uncover pathogenic variants that cause disease phenotypes. This process is streamlined by comparing the patient's DNA against a family member’s DNA and analyzing differences in their DNA sequences. Variants found in both the patient and familial control sequences are eliminated, while unique patient-specific variants are further investigated for pathogenicity.
+A genetic testing company specializes in analyzing an individual's DNA to provide insights into various aspects of their genetic makeup. The primary goal is to uncover pathogenic variants that cause disease phenotypes. This process can be streamlined by comparing the patient's DNA against a family member’s and looking at the differences between their DNA sequence. Variants that are found in both the patient and the familial control’s sequence can be eliminated, while variants that are only in the patients sequence can be further investigated for pathogenicity. 
 
-Genetic testing provides potential health insights, including:
-- **Predispositions to diseases**: Informing individuals about potential health risks.
-- **Identification of hereditary conditions**: Helping families assess risks of passing genetic disorders to future generations.
+Genetic testing can reveal potential health risks based on variations in specific genes. This information may include predispositions to certain diseases or conditions, allowing individuals to make informed decisions about their lifestyle, healthcare, and preventive measures. In addition to this, genetic testing helps individuals identify whether they carry specific genetic mutations associated with hereditary conditions. This information is particularly relevant for family planning, as it can indicate the risk of passing on certain genetic disorders to future generations.
 
-Patients are referred to this company through genetic counselors, ensuring the proper test is selected for the patient's phenotype. The counselors also provide support, address concerns, and help interpret genetic test results.
+Patients are referred to this company through genetics counselors to ensure they are receiving the proper test for their phenotype. Genetic counselors provide support, address concerns, and help interpret the implications of genetic information. The specific type of genetic testing is chosen based on specific interests and concerns, whether related to ancestry, health, or other factors. 
 
-**Sample Processing**:
-- DNA extraction is performed using Qiagen DNA extraction kits.
-- DNA libraries are prepared using Illumina library prep kits.
-- Sequencing is conducted on Illumina Next-Generation Sequencers.
+This company performs DNA extraction from whole blood, bone marrow, and saliva samples using Qiagen DNA extraction kits. DNA libraries are prepared for sequencing using Illumina library prep kits and sequenced on Illumina Next-Generation Sequencers.
+
 
 ---
 
 ## Clinical Database Requirements
 
-The database records patient and family information, specimen data, test orders, and results. Key features include:
-- **Patient Information**: Each patient has a unique Patient ID (PID) and demographic details.
-- **Family Controls**: Relatives have unique Family IDs (FID) and are associated with a single patient.
-- **Specimen Data**: Each specimen has a unique Specimen ID (SID) and is linked to the patient and optionally to familial controls.
-- **Test Data**: Each test order has a unique Test ID (TID) and is associated with a specimen.
-- **Results**: Results include unique Variant IDs (VID) for positive findings and unique Inconclusive IDs (IID) for inconclusive results.
+Patient and family information will be recorded when they are referred from their clinician or genetic counselor. Patient demographic data (first name, last name, sex, age, ethnicity, address, and phone number) will be associated with a unique patient ID (PID). Relatives that participate as familial controls will have unique family IDs (FID) for their information (first name, last name, sex, age, ethnicity). Patients can have multiple familial controls but each familial control will only be associated with one patient. 
+
+Each patient and familial control will provide a specimen for genetic testing. Specimen data (specimen type, collection date, volume, stability) will have a unique specimen ID (SID). All specimens will be associated with a patient, but will only be associated with a familial control ID if it came from a family member and not a patient.
+
+Once specimens are provided, they will have tests ordered under unique test IDs (TID). Test data (turn-around time, and methodology) will be tied to specimen IDs. In addition to this, each specimen will be provided with a result once testing is finished. Results that identify variants are tied to unique variant IDs (VID) which are associated with variant data (gene, c.dot, p.dot, and classification). Results that are inconclusive will have unique inconclusive IDs (IID) which are associated with the corresponding inconclusive result data (notes).
 
 ---
 
 ## Conceptual Data Model
 
-![Conceptual Data Model](path/to/conceptual-data-model-image)
+![Conceptual Data Model](Images/ERModel.png)
 
-- **Entities**: Represented as rectangles.
-- **Relations**: Represented as diamonds.
-- **Attributes**: Represented as ovals.
-- **Specialization**: Results are either variants or inconclusive but not both.
+### Figure 1. Conceptual data model for genetic testing company. Entities are represented as rectangles, relations as diamonds, and attributes as ovals. Identify attributes are underlined and multivalued attributes are in double ovals.One-to-many cardinality is represented by a 1 and M between relationship entities. A double line connected to a circle with single line branches represents total specialization; ie: a specimen's result can have either a variant or be inconclusive but not both.
 
----
+![Logical Database Model](Images/LogicalDatabase.png)
 
-## Logical Database Design
-
-![Logical Database Design](path/to/logical-database-design-image)
-
-- **Primary Keys (PK)**: Uniquely identify records in tables.
-- **Foreign Keys (FK)**: Establish relationships between tables.
+### Figure 2. Logical Database Design for genetic testing company. Entities are represented as relation tables. Foreign keys are labeled as FK and primary keys are labeled as PK.
 
 ---
 
