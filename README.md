@@ -1,5 +1,7 @@
 # Clinical Database for Genetic Testing Center
 
+> **Disclaimer**: This project is based on a fictional genetic testing company and was created as a final project for a Clinical Database Design course. The database design, data, and queries are intended solely for educational purposes.
+
 ## Background
 
 A genetic testing company specializes in analyzing an individual's DNA to provide insights into various aspects of their genetic makeup. The primary goal is to uncover pathogenic variants that cause disease phenotypes. This process can be streamlined by comparing the patient's DNA against a family member’s and looking at the differences between their DNA sequence. Variants that are found in both the patient and the familial control’s sequence can be eliminated, while variants that are only in the patients sequence can be further investigated for pathogenicity. 
