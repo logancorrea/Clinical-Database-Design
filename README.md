@@ -135,5 +135,66 @@ FROM PATIENT
 JOIN SPECIMEN ON PATIENT.PID = SPECIMEN.PID
 JOIN VARIANT ON SPECIMEN.SID = VARIANT.SID;
 ```
+### Query to find familial controls with variants
+```sql
+SELECT DISTINCT
+  FAMCONTROL.F_FirstName,
+  FAMCONTROL.F_LastName,
+  VARIANT.Gene,
+  VARIANT.cdot,
+  VARIANT.pdot,
+  VARIANT.Classification
+FROM FAMCONTROL
+JOIN SPECIMEN ON FAMCONTROL.FID = SPECIMEN.FID
+JOIN VARIANT ON SPECIMEN.SID = VARIANT.SID;
+```
 
+### Query to find patients and familial controls with gemrline variants
+```sql
+SELECT DISTINCT
+  PATIENT.FirstName || 'and' || FAMCONTROL.F_FirstName AS SharedFirstName,
+  COALESCE(PATIENT.LastName, FAMCONTROL.F_LastName) AS SharedLastName,
+    VARIANT.Gene,
+    VARIANT.cdot,
+    VARIANT.pdot,
+    VARIANT.Classification
+FROM VARIANT
+JOIN SPECIMEN ON VARIANT.SID = SPECIMEN.SID
+JOIN PATIENT ON SPECIMEN.PID = PATIENT.PID
+JOIN FAMCONTROL ON SPECIMEN.FID = FAMCONTROL.FID;
+```
 
+### Query to find patients with somatic variants
+```sql
+SELECT
+  PATIENT.FirstName,
+  PATIENT.LastName,
+  VARIANT.Gene,
+  VARIANT.cdot,
+  VARIANT.pdot,
+  VARIANT.Classification
+FROM PATIENT
+JOIN SPECIMEN ON PATIENT.PID = SPECIMEN.PID
+JOIN VARIANT ON SPECIMEN.SID = VARIANT.SID;
+GROUP BY PATIENT.FirstName, PATIENT.LastName, VARIANT.Gene, VARIANT.cdot, VARIANT.pdot, VARIANT.CLassification
+HAVING COUNT(VARIANT.SID) = 1;
+```
+
+### Query to find specimen with the earliest turnaround time
+```sql
+SELECT
+  TEST.SID AS SpecimenID,
+  SPECIMEN.Type,
+  SPECIMEN.Collection_Date,
+  TEST.TAT AS TurnaroundTime
+FROM TEST
+JOIN SPECIMEN ON TEST.SID = SPECIMEN.SID
+ORDER BY TEST.TAT
+LIMI 1;
+```
+
+## Discussion
+
+The most significant challenge for this database construction was identifying how to associate patient results with their familial control results. I found the easiest solution to this problem was to associate the results with each specimen that was provided and then tie the specimen back to the patient and familial controls. In addition to this, I found it difficult to modify attribute types using SQLite. When correcting mistakes that were made in column types, SQLite didn’t seem to support MODIFY COLUMN on ALTER TABLE. This led to me needing to drop the column and recreate it entirely. In the future, I would use a more advanced SQL software to code this database. 
+
+Given more time and resources, I would improve upon this project by including connections to referring clinicians and genetic counselors so their data could be included in the database. Ideally, these clinicians would have their own databases where they gather patient demographics and determine the appropriate panel to order for genetic testing.
