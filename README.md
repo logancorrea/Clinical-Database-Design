@@ -21,19 +21,17 @@ Each patient and familial control will provide a specimen for genetic testing. S
 
 Once specimens are provided, they will have tests ordered under unique test IDs (TID). Test data (turn-around time, and methodology) will be tied to specimen IDs. In addition to this, each specimen will be provided with a result once testing is finished. Results that identify variants are tied to unique variant IDs (VID) which are associated with variant data (gene, c.dot, p.dot, and classification). Results that are inconclusive will have unique inconclusive IDs (IID) which are associated with the corresponding inconclusive result data (notes).
 
----
-
 ## Conceptual Data Model
 
 ![Conceptual Data Model](Images/ERModel.png)
 
-### Figure 1. Conceptual data model for genetic testing company. Entities are represented as rectangles, relations as diamonds, and attributes as ovals. Identify attributes are underlined and multivalued attributes are in double ovals.One-to-many cardinality is represented by a 1 and M between relationship entities. A double line connected to a circle with single line branches represents total specialization; ie: a specimen's result can have either a variant or be inconclusive but not both.
+<sub>**Figure 1.** Conceptual data model for genetic testing company. Entities are represented as rectangles, relations as diamonds, and attributes as ovals. Identify attributes are underlined and multivalued attributes are in double ovals.One-to-many cardinality is represented by a 1 and M between relationship entities. A double line connected to a circle with single line branches represents total specialization; ie: a specimen's result can have either a variant or be inconclusive but not both.</sub>
+
+## Logical Database Design Model
 
 ![Logical Database Model](Images/LogicalDatabase.png)
 
-### Figure 2. Logical Database Design for genetic testing company. Entities are represented as relation tables. Foreign keys are labeled as FK and primary keys are labeled as PK.
-
----
+<sub>**Figure 2.** Logical Database Design for genetic testing company. Entities are represented as relation tables. Foreign keys are labeled as FK and primary keys are labeled as PK.</sub>
 
 ## Database Design Language (DDL) Implementation
 
@@ -50,3 +48,92 @@ CREATE TABLE [PATIENT](
   [Phone] integer, 
   CONSTRAINT [PATIENT_PK] PRIMARY KEY([PID])
 );
+```
+
+### Familial Control Table
+```sql
+CREATE TABLE [FAMCONTROL](
+  [FID] varchar(15) NOT NULL, 
+  [PID] varchar(15) NOT NULL, 
+  [Relation] varchar(15), 
+  [F_FirstName] varchar(15), 
+  [F_LastName] varchar(25), 
+  [F_Sex] varchar(6), 
+  [F_Age] integer, 
+  [F_Ethnicity] varchar(25), 
+  CONSTRAINT [FAMCONTROL_PK] PRIMARY KEY([FID]), 
+  CONSTRAINT [FAMCONTROL_fk1] FOREIGN KEY([PID]) REFERENCES [PATIENT]([PID])
+);
+```
+
+### Specimen Table
+```sql
+CREATE TABLE [SPECIMEN](
+  [SID] varchar(15) NOT NULL, 
+  [PID] varchar(15) NOT NULL, 
+  [FID] varchar(15), 
+  [Type] varchar(25), 
+  [Collection_Date] date, 
+  [Volume] varchar(15), 
+  [Stability] varchar(25), 
+  CONSTRAINT [SPECIMEN_PK] PRIMARY KEY([SID]), 
+  CONSTRAINT [SPECIMEN_fk1] FOREIGN KEY([PID]) REFERENCES [PATIENT]([PID]), 
+  CONSTRAINT [SPECIMEN_fk2] FOREIGN KEY([FID]) REFERENCES [FAMCONTROL]([FID])
+);
+```
+
+### Test Table
+```sql
+CREATE TABLE [TEST](
+  [TID] varchar(15) NOT NULL, 
+  [SID] varchar(15) NOT NULL, 
+  [TAT] varchar(25), 
+  [Methodology] varchar(25), 
+  CONSTRAINT [TEST_PK] PRIMARY KEY([TID]), 
+  CONSTRAINT [TEST_fk1] FOREIGN KEY([SID]) REFERENCES [SPECIMEN]([SID])
+);
+```
+
+### Variant Table
+```sql
+CREATE TABLE [VARIANT](
+  [VID] varchar(25) NOT NULL, 
+  [SID] varchar(25) NOT NULL, 
+  [Gene] varchar(25), 
+  [cdot] varchar(25), 
+  [pdot] varchar(25), 
+  [Classification] varchar(25), 
+  CONSTRAINT [VARIANT_PK] PRIMARY KEY([VID]), 
+  CONSTRAINT [VARIANT_fk1] FOREIGN KEY([SID]) REFERENCES [SPECIMEN]([SID])
+);
+```
+
+### Inconclusive Table
+```sql
+CREATE TABLE [INCONCLUSIVE](
+  [IID] varchar(15) NOT NULL, 
+  [SID] varchar(15) NOT NULL, 
+  [Notes] varchar(50), 
+  CONSTRAINT [INCONCLUSIVE_PK] PRIMARY KEY([IID]), 
+  CONSTRAINT [INCONCLUSIVE_fk1] FOREIGN KEY([SID]) REFERENCES [SPECIMEN]([SID])
+);
+```
+Attribute values were inserted into data tables using INSERT VALUES SQL functions. The data was fabricated using random patient data and variants that are commonly found in general DNA testing.
+
+## Example Queries
+
+### Query to find patients with variants
+```sql
+SELECT DISTINCT
+  PATIENT.FirstName,
+  PATIENT.LastName,
+  VARIANT.Gene,
+  VARIANT.cdot,
+  VARIANT.pdot,
+  VARIANT.Classification
+FROM PATIENT
+JOIN SPECIMEN ON PATIENT.PID = SPECIMEN.PID
+JOIN VARIANT ON SPECIMEN.SID = VARIANT.SID;
+```
+
+
